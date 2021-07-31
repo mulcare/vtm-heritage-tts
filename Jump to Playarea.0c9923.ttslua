@@ -1,0 +1,11 @@
+function onLoad()
+  self.createButton({click_function = 'focusPlayarea',
+                                 function_owner = Global,
+                                 label = 'Jump to\nPlayarea',
+                                 position = {0, .15, 0},
+                                 rotation = {0, 0, 0},
+                                 width = 650,
+                                 height =  400,
+                                 font_size = 150
+                               })
+end

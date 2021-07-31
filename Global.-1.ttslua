@@ -1,0 +1,354 @@
+--------------------------------------------------------------------------------
+-- GUIDS & VARIABLES-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
+entirePlayArea = '8fd596'
+
+firstPlayerAnkhGUID = '224424'
+roundMarker = '6d674f'
+
+bagPowerGUID = 'db384f'
+bagTorporGUID = '4e4e6b'
+bagInfamyGUID = 'f5f2ad'
+
+characterDeckGUID = '9e6e88'
+
+queueGUID = {}
+queueGUID[5] = '80e22c'
+queueGUID[4] = 'e07907'
+queueGUID[3] = '335dcc'
+queueGUID[2] = '147841'
+queueGUID[1] = '01b8b7'
+
+playerInfo = {
+  Red = {     playAreaGUID  = '7d9323',
+              yawDegrees    = 0 },
+
+  Yellow = {  playAreaGUID  = '028e3b',
+              yawDegrees    = 0 },
+
+  Green = {   playAreaGUID  = 'bbd1c2',
+              yawDegrees    = 270 },
+
+  Blue = {    playAreaGUID  = '538b7f',
+              yawDegrees    = 90 }
+  }
+
+
+tokenTypes = {
+  'Power',
+  'Power x 3',
+  'Infamy',
+  'Infamy x 3',
+  'Torpor/Exhaustion'
+}
+
+clearTokensButtonGUID = '138e3e'
+clearConfirmed = false
+--------------------------------------------------------------------------------
+-- onLoad CONFIGURATION --------------------------------------------------------
+--------------------------------------------------------------------------------
+function onLoad()
+
+end
+
+--------------------------------------------------------------------------------
+-- CAMERA FOCUS LOCATIONS ----------------------------------------------------------
+--------------------------------------------------------------------------------
+function playAreaPos(color)
+  local playArea = getObjectFromGUID(playerInfo[color]['playAreaGUID'])
+  local playAreaBounds = playArea.getBounds()
+  local playAreaCenter = playAreaBounds["center"]
+  return playAreaCenter
+end
+
+function playerYawDegrees(color)
+  return playerInfo[color]['yawDegrees']
+end
+
+function focusPlayarea(button, color)
+  local playAreaPos = playAreaPos(color)
+  local yawDegrees = playerYawDegrees(color)
+  Player[color].lookAt({
+        position = playAreaPos,
+        pitch = 90,
+        yaw = yawDegrees,
+        distance = 35
+      })
+end
+
+function focusMainBoards(button, color)
+  Player[color].lookAt({
+    position = {5.45, 1, 6.52},
+    pitch = 90,
+    yaw = 0,
+    distance = 30
+  })
+end
+
+--------------------------------------------------------------------------------
+-- TOKEN CLEANUP----------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+function clearAllTokens()
+  local clearTokensButton = getObjectFromGUID(clearTokensButtonGUID)
+
+  local playAreas = {}
+  for _, infoTable in pairs(playerInfo) do
+    local playAreaGUID = infoTable['playAreaGUID']
+    table.insert(playAreas, getObjectFromGUID(playAreaGUID))
+  end
+
+  if clearConfirmed then
+    for _, playArea in ipairs(playAreas) do
+      local pieces = playArea.getObjects()
+      for _, piece in ipairs(pieces) do
+        for _, tokenType in ipairs(tokenTypes) do
+          if piece.getName()  == tokenType then
+            destroyObject(piece)
+          end
+        end
+      end
+      clearConfirmed = false
+      clearTokensButton.editButton({index=0, label='Clear\nAll\nTokens', font_color={r=0,g=0,b=0}})
+    end
+  else
+    clearTokensButton.editButton({index=0, label='CONFIRM', font_color={r=1,g=0,b=0}})
+    clearConfirmed = true
+  end
+end
+
+
+--------------------------------------------------------------------------------
+-- ADD TOKENS TO CARDS ---------------------------------------------------------
+--------------------------------------------------------------------------------
+function onObjectPickUp(_, obj)
+  if obj.name == "Card" or obj.name == "CardCustom" then
+    buildCardContextMenus(obj)
+  end
+end
+
+function buildCardContextMenus(card)
+  card.clearContextMenu()
+  local func = function(player_color) addPower(card) end
+  card.addContextMenuItem('Add Power Token', func)
+  local func = function(player_color) addInfamy(card) end
+  card.addContextMenuItem('Add Infamy Token', func)
+  local func = function(player_color) addExhaustion(card) end
+  card.addContextMenuItem('Exhaust Vampire', func)
+  local func = function(player_color) addTorpor(card) end
+  card.addContextMenuItem('Torpor Vampire', func)
+end
+
+function addPower(card)
+  tokenSource = getObjectFromGUID(bagPowerGUID)
+  local cardPos = card.getPosition()
+  cardPos[2] = cardPos[2]*1.25
+  tokenSource.takeObject({position = cardPos})
+end
+
+function addInfamy(card)
+  tokenSource = getObjectFromGUID(bagInfamyGUID)
+  local cardPos = card.getPosition()
+  cardPos[2] = cardPos[2]*1.25
+  tokenSource.takeObject({position = cardPos})
+end
+
+function addTorpor(card)
+  local cardPos = card.getPosition()
+  cardPos[1] = cardPos[1] + .75
+  cardPos[2] = cardPos[2] * 1.25
+  cardPos[3] = cardPos[3] - .75
+  local bagTorpor = getObjectFromGUID(bagTorporGUID)
+  local torporToken = bagTorpor.takeObject({position = cardPos})
+  torporToken.rotate({x=0, y=180, z=0})
+  torporToken.addTag('torporToken')
+end
+
+function addExhaustion(card)
+  local cardPos = card.getPosition()
+  cardPos[1] = cardPos[1] + .75
+  cardPos[2] = cardPos[2] * 1.25
+  cardPos[3] = cardPos[3] - .75
+  local bagTorpor = getObjectFromGUID(bagTorporGUID)
+  local torporToken = bagTorpor.takeObject({position = cardPos})
+end
+
+
+
+--------------------------------------------------------------------------------
+-- CHARACTER QUEUE -------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Recruiting-------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Characters can be recruited from the character queue. They will leave their
+-- position in the queue and be drawn into the player's hand. The camera will
+-- move to that player's play area to avoid excessive camera dragging and
+-- repositioning
+
+function recruitCharacter5(sourceboard, color)
+  recruitCharacter(color, '5')
+end
+
+function recruitCharacter4(sourceboard, color)
+  recruitCharacter(color, '4')
+end
+
+function recruitCharacter3(sourceboard, color)
+  recruitCharacter(color, '3')
+end
+
+function recruitCharacter2(sourceboard, color)
+  recruitCharacter(color, '2')
+end
+
+function recruitCharacter1(sourceboard, color)
+  recruitCharacter(color, '1')
+end
+
+function recruitCharacter(color, queuePos)
+
+  local objs = getObjectFromGUID(queueGUID[tonumber(queuePos)]).getObjects()
+  local playAreaPos = playAreaPos(color)
+  local yawDegrees = playerYawDegrees(color)
+
+  for _, obj in ipairs(objs) do
+    if obj.type == 'Card' then
+      obj.deal(1, color)
+      Player[color].lookAt({
+        position = playAreaPos,
+        pitch = 90,
+        yaw = yawDegrees,
+        distance = 35
+      })
+    end
+  end
+end
+--------------------------------------------------------------------------------
+-- Queue Refresh ---------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Whenever a charcter is recruited, or any number of characters leave the queue
+-- for any reason, all remaining cards should shift to the right and new cards
+-- from the deck should be drawn and added to the queue until it is full
+
+
+function refreshQueue()
+  for i=1, 4, 1 do
+    local isEmpty = queueIsEmpty(getObjectFromGUID(queueGUID[i]))
+    if isEmpty then
+      print("Empty")
+      shiftCardRight(getObjectFromGUID(queueGUID[i+1]), getObjectFromGUID(queueGUID[i]))
+    else
+      print("Not Empty")
+    end
+  end
+  drawCardToQueue(getObjectFromGUID(queueGUID[5]))
+end
+
+function queueCompletelyFull()
+  local full = true
+  for i=1, 4, 1 do --change to 5 once card draw is implemented
+    if queueIsEmpty(getObjectFromGUID(queueGUID[i])) then
+      full = false
+    end
+  end
+  return full
+end
+
+function queueIsEmpty(queuePos)
+  local pieces = queuePos.getObjects()
+  local empty = true
+  for _, piece in ipairs(pieces) do
+    --print(piece.name)
+    if piece.name == "Card" or piece.name == "CardCustom" then
+      empty = false
+    end
+  end
+  return empty
+end
+
+function shiftCardRight(originQueuePos, targetQueuePos)
+  local target = targetQueuePos.getBounds().center
+
+  local pieces = originQueuePos.getObjects()
+
+  for _, piece in ipairs(pieces) do
+    if piece.name == "Card" or piece.name == "CardCustom" then
+      piece.setPosition(target)
+    end
+  end
+  -- confirm targetQueuePos is empty
+  -- check if directly to the left of targetQueuePos is empty; if it isn't, shift it to targetQueuePos
+  -- if it IS empty, run shiftCardRight on THAT queuePos
+end
+
+function drawCardToQueue(targetQueuePos)
+  local target = targetQueuePos.getBounds().center
+  local pieces = getObjectFromGUID(characterDeckGUID).getObjects()
+
+  if queueIsEmpty(targetQueuePos) then
+    for _, piece in ipairs(pieces) do
+      if piece.name == "Deck" or piece.name == "CustomDeck" then
+        local drawnCard = piece.takeObject({position = target})
+        drawnCard.rotate({x=0, y=0, z=180})
+        drawnCard.setPosition(target)
+      end
+    end
+  end
+end
+
+
+
+--------------------------------------------------------------------------------
+-- TURN ORDER MANAGEMENT--------------------------------------------------------
+--------------------------------------------------------------------------------
+-- When the round marker is dropped, the turn order updates according to which
+-- play area the first player ankh is located. Play goes clockwise.
+
+function updateTurnOrder()
+  Turns.enable = false
+  local firstPlayer = findFirstPlayer()
+  local order = clockwiseTurns(firstPlayer)
+  Turns.order = order
+  Turns.enable = true
+end
+
+function clockwiseTurns(firstPlayer)
+  local order = {}
+  if firstPlayer == 'Red' then
+    order = {'Red', 'Blue', 'Green', 'Yellow'}
+  elseif firstPlayer == 'Green' then
+    order = {'Green', 'Yellow', 'Red', 'Blue'}
+  elseif firstPlayer == 'Blue' then
+    order = {'Blue', 'Green', 'Yellow', 'Red'}
+  else
+    order = {'Yellow', 'Red', 'Blue', 'Green'}
+  end
+  return order
+end
+
+function findFirstPlayer()
+  local firstPlayerAnkh = getObjectFromGUID(firstPlayerAnkhGUID)
+
+  for color, infoTable in pairs(playerInfo) do
+    local playAreaContents = getObjectFromGUID(infoTable['playAreaGUID']).getObjects()
+    for _, piece in ipairs(playAreaContents) do
+      if firstPlayerAnkh == piece then
+        print('First player ankh is in ' .. color .. ' player\'s play area. Setting ' .. color .. ' as first player.')
+        return color
+      end
+    end
+  end
+end
+
+--------------------------------------------------------------------------------
+-- CLAN BOARDS AND CLAN DECKS --------------------------------------------------
+--------------------------------------------------------------------------------
+
+function takeClanBoard(obj, color)
+  yellowCorner = {28.51, 1.66, -34.195}
+  clanLeaderCardPos = { yellowCorner[1] - 1.85, yellowCorner[2], yellowCorner[3] - .39 }
+  obj.setPosition(yellowCorner)
+
+  clanLeaderCard = getObjectFromGUID('9d8c11')
+  clanLeaderCard.setPositionSmooth(clanLeaderCardPos)
+end

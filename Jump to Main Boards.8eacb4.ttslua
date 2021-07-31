@@ -1,0 +1,11 @@
+function onLoad()
+  self.createButton({click_function = 'focusMainBoards',
+                                 function_owner = Global,
+                                 label = 'Jump to\nMain Boards',
+                                 position = {0, .15, 0},
+                                 rotation = {0, 0, 0},
+                                 width = 650,
+                                 height =  400,
+                                 font_size = 100
+                               })
+end

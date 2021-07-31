@@ -1,0 +1,32 @@
+<Defaults>
+  <Text
+    fontSize="14"
+    color="#ffffff" />
+</Defaults>
+<Panel position="-55.75 -76 -12" rotation="0 0 180">
+  <Text id="power" text = "0" />
+</Panel>
+
+<Panel position="-55.75 -53.15 -12" rotation="0 0 180">
+  <Text id="infamy" text = "0" />
+</Panel>
+
+<Panel position="-55.75 -30.3 -12" rotation="0 0 180">
+  <Text id="boons" text = "0" />
+</Panel>
+
+<Panel position="-55.75 -7.45 -12" rotation="0 0 180">
+  <Text id="battleground1" text = "0" />
+</Panel>
+
+<Panel position="-55.75 15.4 -12" rotation="0 0 180">
+  <Text id="battleground2" text = "0" />
+</Panel>
+
+<Panel position="-55.75 38.25 -12" rotation="0 0 180">
+  <Text id="battleground3" text = "0" />
+</Panel>
+
+<Panel position="-60 73 -12" rotation="0 0 180">
+  <Text id="chapterScore" text = "0" fontSize="30"/>
+</Panel>

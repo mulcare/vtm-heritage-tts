@@ -1,0 +1,3 @@
+function onDrop(player_color)
+  Global.call('updateTurnOrder')
+end

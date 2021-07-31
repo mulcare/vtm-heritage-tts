@@ -1,0 +1,159 @@
+
+
+function onLoad()
+
+  function buildButtons()
+    local buttons = buildButtonParams()
+    for func, pos in pairs(buttons) do
+      self.createButton(buttonParams(func, pos))
+    end
+  end
+
+  function buttonParams(func, pos)
+    local buttonParams = {
+      click_function = func,
+      function_owner = self,
+      label = '',
+      position = pos,
+      width = 80,
+      height = 80
+    }
+    return buttonParams
+  end
+
+  buildButtons()
+
+  self.createButton({
+    click_function = 'clearScores',
+    function_owner = self,
+    label = '',
+    position = {.60, .01, .75},
+    width = 100,
+    height = 100
+  })
+
+end
+
+function buildButtonParams()
+  local buttons = {}
+  buttons['decPower'] = {.40, .01, -.75}
+  buttons['decInfamy'] = {.40, .01, -.53}
+  buttons['decBoons'] = {.40, .01, -.31}
+  buttons['decBattleground1'] = {.40, .01, -.07}
+  buttons['decBattleground2'] = {.40, .01, .17}
+  buttons['decBattleground3'] = {.40, .01, .40}
+  buttons['incPower'] = {.72, .01, -.75}
+  buttons['incInfamy'] = {.72, .01, -.53}
+  buttons['incBoons'] = {.72, .01, -.31}
+  buttons['incBattleground1'] = {.72, .01, -.07}
+  buttons['incBattleground2'] = {.72, .01, .17}
+  buttons['incBattleground3'] = {.72, .01, .40}
+  return buttons
+end
+
+
+
+function incPower()
+  local power = self.UI.getAttribute("power", "text")
+  power = tonumber(power)
+  self.UI.setAttribute("power", "text", power + 1)
+  Wait.frames(function() chapterScore() end, 60)
+end
+
+function decPower()
+  local power = self.UI.getAttribute("power", "text")
+  power = tonumber(power)
+  self.UI.setAttribute("power", "text", power - 1)
+  Wait.frames(function() chapterScore() end, 60)
+end
+
+function incInfamy()
+  local infamy = self.UI.getAttribute("infamy", "text")
+  infamy = tonumber(infamy)
+  self.UI.setAttribute("infamy", "text", infamy + 1)
+  Wait.frames(function() chapterScore() end, 60)
+end
+
+function decInfamy()
+  local infamy = self.UI.getAttribute("infamy", "text")
+  infamy = tonumber(infamy)
+  self.UI.setAttribute("infamy", "text", infamy - 1)
+  Wait.frames(function() chapterScore() end, 60)
+end
+
+function incBoons()
+  local boons = self.UI.getAttribute("boons", "text")
+  boons = tonumber(boons)
+  self.UI.setAttribute("boons", "text", boons + 1)
+  Wait.frames(function() chapterScore() end, 60)
+end
+
+function decBoons()
+  local boons = self.UI.getAttribute("boons", "text")
+  boons = tonumber(boons)
+  self.UI.setAttribute("boons", "text", boons - 1)
+  Wait.frames(function() chapterScore() end, 60)
+end
+
+function incBattleground1()
+  local bg1 = self.UI.getAttribute("battleground1", "text")
+  bg1 = tonumber(bg1)
+  self.UI.setAttribute("battleground1", "text", bg1 + 1)
+  Wait.frames(function() chapterScore() end, 60)
+end
+
+function decBattleground1()
+  local bg1 = self.UI.getAttribute("battleground1", "text")
+  bg1 = tonumber(bg1)
+  self.UI.setAttribute("battleground1", "text", bg1 - 1)
+  Wait.frames(function() chapterScore() end, 60)
+end
+
+function incBattleground2()
+  local bg2 = self.UI.getAttribute("battleground2", "text")
+  bg2 = tonumber(bg2)
+  self.UI.setAttribute("battleground2", "text", bg2 + 1)
+  Wait.frames(function() chapterScore() end, 60)
+end
+
+function decBattleground2()
+  local bg2 = self.UI.getAttribute("battleground2", "text")
+  bg2 = tonumber(bg2)
+  self.UI.setAttribute("battleground2", "text", bg2 - 1)
+  Wait.frames(function() chapterScore() end, 60)
+end
+
+function incBattleground3()
+  local bg3 = self.UI.getAttribute("battleground3", "text")
+  bg3 = tonumber(bg3)
+  self.UI.setAttribute("battleground3", "text", bg3 + 1)
+  Wait.frames(function() chapterScore() end, 60)
+end
+
+function decBattleground3()
+  local bg3 = self.UI.getAttribute("battleground3", "text")
+  bg3 = tonumber(bg3)
+  self.UI.setAttribute("battleground3", "text", bg3 - 1)
+  Wait.frames(function() chapterScore() end, 60)
+end
+
+function chapterScore()
+  local power = self.UI.getAttribute("power", "text")
+  local infamy = self.UI.getAttribute("infamy", "text")
+  local boons = self.UI.getAttribute("boons", "text")
+  local bg1 = self.UI.getAttribute("battleground1", "text")
+  local bg2 = self.UI.getAttribute("battleground2", "text")
+  local bg3 = self.UI.getAttribute("battleground3", "text")
+  local score = power + infamy + boons + bg1 + bg2 + bg3
+  self.UI.setAttribute("chapterScore", "text", score)
+end
+
+function clearScores()
+  self.UI.setAttribute("power", "text", "0")
+  self.UI.setAttribute("infamy", "text", "0")
+  self.UI.setAttribute("boons", "text", "0")
+  self.UI.setAttribute("battleground1", "text", "0")
+  self.UI.setAttribute("battleground2", "text", "0")
+  self.UI.setAttribute("battleground3", "text", "0")
+  Wait.frames(function() chapterScore() end, 60)
+end

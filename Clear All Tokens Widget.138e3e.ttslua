@@ -1,0 +1,11 @@
+function onLoad()
+  self.createButton({click_function = 'clearAllTokens',
+                                 function_owner = Global,
+                                 label = 'Clear\nAll\nTokens',
+                                 position = {0, .15, 0},
+                                 rotation = {0, 0, 0},
+                                 width = 500,
+                                 height = 500,
+                                 font_size = 100
+                               })
+end
